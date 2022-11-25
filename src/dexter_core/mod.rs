@@ -1,6 +1,6 @@
-mod common;
-mod hash;
-mod store;
+pub mod common;
+pub mod hash;
+pub mod store;
 
 use common::Password;
 
@@ -17,14 +17,23 @@ where
     H: hash::Hasher,
     S: store::HashStore,
 {
-    pub fn new(max_password_size: u32, hasher: H, hash_store: S) -> Self {
+    pub fn new(
+        max_password_size: u32,
+        hasher: H,
+        hash_store: S,
+        default_password: Password,
+    ) -> Self {
         let password_hash = hash_store.get();
+        let default_password_hash = hasher.hash(&default_password);
 
         Core {
             max_password_size,
             hasher,
             hash_store,
-            password_hash,
+            password_hash: match password_hash {
+                Some(ph) => ph,
+                None => default_password_hash,
+            },
         }
     }
 
