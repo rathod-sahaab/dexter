@@ -4,20 +4,20 @@ mod store;
 
 use common::Password;
 
-pub struct Core<H: hash::Hasher, HS: store::HashStore> {
+pub struct Core<H: hash::Hasher, S: store::HashStore> {
     max_password_size: u32,
     password_hash: common::Hash,
 
     hasher: H,
-    hash_store: HS,
+    hash_store: S,
 }
 
-impl<H, HS> Core<H, HS>
+impl<H, S> Core<H, S>
 where
     H: hash::Hasher,
-    HS: store::HashStore,
+    S: store::HashStore,
 {
-    pub fn new(max_password_size: u32, hasher: H, hash_store: HS) -> Self {
+    pub fn new(max_password_size: u32, hasher: H, hash_store: S) -> Self {
         let password_hash = hash_store.get();
 
         Core {
