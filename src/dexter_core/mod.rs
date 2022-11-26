@@ -12,11 +12,7 @@ pub struct Core<H: hash::Hasher, S: store::HashStore> {
     hash_store: S,
 }
 
-impl<H, S> Core<H, S>
-where
-    H: hash::Hasher,
-    S: store::HashStore,
-{
+impl<H: hash::Hasher, S: store::HashStore> Core<H, S> {
     pub fn new(
         max_password_size: u32,
         hasher: H,
