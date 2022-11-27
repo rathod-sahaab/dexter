@@ -2,6 +2,8 @@
 #![no_main]
 
 mod dexter_core;
+mod commons;
+mod ui;
 
 extern crate alloc;
 
