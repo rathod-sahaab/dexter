@@ -5,7 +5,12 @@ mod dexter_core;
 
 extern crate alloc;
 
-use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, timer::TimerGroup, Rtc};
+use core::fmt::Write;
+use esp32_hal::{
+    clock::ClockControl, gpio::IO, pac::Peripherals, prelude::*, timer::TimerGroup, Delay, Rtc,
+    Serial,
+};
+
 use esp_backtrace as _;
 #[global_allocator]
 static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
@@ -45,5 +50,19 @@ fn main() -> ! {
     wdt0.disable();
     wdt1.disable();
 
-    loop {}
+    // Real code begins
+    let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
+
+    let mut led = io.pins.gpio25.into_push_pull_output();
+    let mut serial0 = Serial::new(peripherals.UART0);
+
+    let mut delay = Delay::new(&clocks);
+
+    led.set_high().unwrap();
+
+    loop {
+        led.toggle().unwrap();
+        delay.delay_ms(500u32);
+        writeln!(serial0, "Code is running!").unwrap();
+    }
 }
