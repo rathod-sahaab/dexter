@@ -1,18 +1,18 @@
 pub mod common;
-pub mod hash;
+pub mod hasher;
 pub mod store;
 
 use common::Password;
 
-pub struct Core<H: hash::Hasher, S: store::HashStore> {
+pub struct Core<H: hasher::hasher::Hasher, S: store::HashStore> {
     max_password_size: u32,
-    password_hash: common::Hash,
+    password_hash: alloc::boxed::Box<common::Hash>,
 
     hasher: H,
     hash_store: S,
 }
 
-impl<H: hash::Hasher, S: store::HashStore> Core<H, S> {
+impl<H: hasher::hasher::Hasher, S: store::HashStore> Core<H, S> {
     pub fn new(
         max_password_size: u32,
         hasher: H,

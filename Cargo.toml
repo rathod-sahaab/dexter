@@ -9,9 +9,15 @@ license = "MIT OR Apache-2.0"
 esp32-hal = "0.5.0"
 
 esp-alloc = { version = "0.1.0", features = ["oom-handler"] }
-esp-backtrace = { version = "0.2.0", features = ["esp32", "panic-handler", "print-uart"] }
+esp-backtrace = { version = "0.2.0", features = [
+    "esp32",
+    "panic-handler",
+    "print-uart",
+] }
 
 xtensa-lx-rt = { version = "0.13.0", features = ["esp32"], optional = true }
+argon2 = "0.4"
+rand_core = { version = "0.6.4", default-features = false }
 
 [features]
 default = ["rt"]
