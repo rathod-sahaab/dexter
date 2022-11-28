@@ -6,7 +6,7 @@ mod dexter_core;
 mod ui;
 
 use commons::bounds::Bounds;
-use ui::progress::{gpio_progress_bar::GpioProgressBar, progress::Progress};
+use ui::progress::{gpio_progress_bar::GpioProgressBar, progress_bar::Progress};
 
 extern crate alloc;
 

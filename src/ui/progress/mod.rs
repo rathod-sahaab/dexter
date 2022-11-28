@@ -1,2 +1,2 @@
 pub mod gpio_progress_bar;
-pub mod progress;
+pub mod progress_bar;

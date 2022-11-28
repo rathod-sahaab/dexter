@@ -2,7 +2,7 @@ use core::convert::Infallible;
 
 use esp32_hal::prelude::_embedded_hal_digital_v2_OutputPin as OutputPin;
 
-use super::success_failure_indicator::SuccessFaliureIndicator;
+use super::sfi::SuccessFaliureIndicator;
 
 pub struct GpioSuccessFaliureIndicator<
     T: OutputPin<Error = Infallible>,

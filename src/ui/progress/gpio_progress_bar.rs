@@ -4,7 +4,7 @@ use esp32_hal::prelude::_embedded_hal_digital_v2_OutputPin as OutputPin;
 
 use crate::commons::bounds::Bounds;
 
-use super::progress::Progress;
+use super::progress_bar::Progress;
 
 pub struct GpioProgressBar<'a, const MAX_PINS: usize> {
     pins: [&'a mut dyn OutputPin<Error = Infallible>; MAX_PINS],
