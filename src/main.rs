@@ -38,6 +38,7 @@ fn init_heap() {
         ALLOCATOR.init(heap_start as *mut u8, HEAP_SIZE);
     }
 }
+
 #[xtensa_lx_rt::entry]
 fn main() -> ! {
     let peripherals = Peripherals::take().unwrap();

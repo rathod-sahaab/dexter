@@ -1,2 +1,2 @@
-pub mod progress;
+pub mod gpio_sfi;
 pub mod success_failure_indicator;
