@@ -59,13 +59,13 @@ fn main() -> ! {
     let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
 
     let mut led = io.pins.gpio25.into_push_pull_output();
+    let mut led2 = io.pins.gpio24.into_push_pull_output();
+
+    let mut progress_bar = GpioProgressBar::new([&mut led, &mut led2]);
+
     let mut serial0 = Serial::new(peripherals.UART0);
 
     let mut delay = Delay::new(&clocks);
-
-    led.set_high().unwrap();
-
-    let mut progress_bar = GpioProgressBar::new([led]);
 
     loop {
         progress_bar.show(Bounds { max: 1, min: 0 }, 1);
