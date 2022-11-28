@@ -1,9 +1,12 @@
 #![no_std]
 #![no_main]
 
-mod dexter_core;
 mod commons;
+mod dexter_core;
 mod ui;
+
+use commons::bounds::Bounds;
+use ui::progress::{gpio_progress_bar::GpioProgressBar, progress::Progress};
 
 extern crate alloc;
 
@@ -62,8 +65,10 @@ fn main() -> ! {
 
     led.set_high().unwrap();
 
+    let mut progress_bar = GpioProgressBar::new([led]);
+
     loop {
-        led.toggle().unwrap();
+        progress_bar.show(Bounds { max: 1, min: 0 }, 1);
         delay.delay_ms(500u32);
         writeln!(serial0, "Code is running!").unwrap();
     }
