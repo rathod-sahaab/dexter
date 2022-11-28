@@ -22,7 +22,7 @@ impl<H: hash::Hasher, S: store::HashStore> Core<H, S> {
         let password_hash = hash_store.get();
         let default_password_hash = hasher.hash(&default_password);
 
-        Core {
+        Self {
             max_password_size,
             hasher,
             hash_store,
