@@ -1,5 +1,4 @@
-pub const MAX_PASSWORD_HASH_LENGTH: usize = 1024;
-pub const MAX_PASSWORD_LENGTH: usize = 100;
+use alloc::string::String;
 
-pub type Hash = [u8];
-pub type Password = [u8; MAX_PASSWORD_LENGTH];
+pub type Hash = String;
+pub type Password = String;

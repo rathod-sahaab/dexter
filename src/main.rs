@@ -5,7 +5,9 @@ mod commons;
 mod dexter_core;
 mod ui;
 
+use alloc::{string::String, vec};
 use commons::bounds::Bounds;
+use dexter_core::hasher::{argon_hasher::ArgonHasher, hasher::Hasher};
 use ui::progress::{gpio_progress_bar::GpioProgressBar, progress_bar::Progress};
 
 extern crate alloc;
@@ -21,7 +23,7 @@ use esp_backtrace as _;
 static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
 
 fn init_heap() {
-    const HEAP_SIZE: usize = 32 * 1024;
+    const HEAP_SIZE: usize = 128 * 1024;
 
     extern "C" {
         static mut _heap_start: u32;
@@ -66,7 +68,22 @@ fn main() -> ! {
 
     let mut serial0 = Serial::new(peripherals.UART0);
 
+    writeln!(
+        serial0,
+        "------------------- Started Program -----------------"
+    )
+    .unwrap();
+
+    init_heap();
+
+    writeln!(serial0, "Heap used: {}", ALLOCATOR.used()).unwrap();
+
     let mut delay = Delay::new(&clocks);
+
+    let argon = ArgonHasher::new(peripherals.RNG);
+    let hash = argon.hash(&String::from("Abhay"));
+
+    writeln!(serial0, "Hash: {}", hash).unwrap();
 
     loop {
         progress_bar.show(Bounds { max: 1, min: 0 }, 1);

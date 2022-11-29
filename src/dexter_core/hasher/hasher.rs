@@ -1,12 +1,10 @@
-use alloc::boxed::Box;
-
 use crate::dexter_core::common::{Hash, Password};
 
 // Trait for a hasher, which is used to encrypt and verify bytes, generally for passwords.
 pub trait Hasher {
     // Hash bytes, produce one-way encrypted constant length hash.
-    fn hash(&self, bytes: &Password) -> Box<Hash>;
+    fn hash(&self, password: &Password) -> Hash;
 
     // Verify if
-    fn verify(&self, hash: &Hash, bytes: &Password) -> bool;
+    fn verify(&self, hash: &Hash, password: &Password) -> bool;
 }

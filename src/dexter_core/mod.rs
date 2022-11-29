@@ -2,11 +2,12 @@ pub mod common;
 pub mod hasher;
 pub mod store;
 
-use common::Password;
+use alloc::borrow::ToOwned;
+use common::{Hash, Password};
 
 pub struct Core<H: hasher::hasher::Hasher, S: store::HashStore> {
     max_password_size: u32,
-    password_hash: alloc::boxed::Box<common::Hash>,
+    password_hash: common::Hash,
 
     hasher: H,
     hash_store: S,
@@ -19,17 +20,17 @@ impl<H: hasher::hasher::Hasher, S: store::HashStore> Core<H, S> {
         hash_store: S,
         default_password: Password,
     ) -> Self {
-        let password_hash = hash_store.get();
         let default_password_hash = hasher.hash(&default_password);
+        let password_hash: Hash = match hash_store.get() {
+            Some(ph) => ph.to_owned(),
+            None => default_password_hash,
+        };
 
         Self {
             max_password_size,
             hasher,
             hash_store,
-            password_hash: match password_hash {
-                Some(ph) => ph,
-                None => default_password_hash,
-            },
+            password_hash,
         }
     }
 

@@ -1,9 +1,7 @@
-use alloc::{borrow::ToOwned, boxed::Box, fmt::format};
-use argon2::{password_hash::SaltString, Argon2, PasswordHasher, PasswordVerifier};
-use esp32_hal::{
-    pac::{Peripherals, RNG},
-    Rng,
-};
+use crate::dexter_core::common::{Hash, Password};
+use alloc::string::ToString;
+use argon2::{password_hash::SaltString, Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+use esp32_hal::{pac::RNG, Rng};
 use rand_core::{impls, CryptoRng, RngCore};
 
 use super::hasher::Hasher;
@@ -13,11 +11,9 @@ struct Generator {
 }
 
 impl Generator {
-    fn new() -> Self {
-        let hardware_rng: RNG = Peripherals::take().unwrap().RNG;
-
+    fn new(rng: RNG) -> Self {
         Self {
-            rng_core: Rng::new(hardware_rng),
+            rng_core: Rng::new(rng),
         }
     }
 }
@@ -32,46 +28,48 @@ impl RngCore for Generator {
     }
 
     fn fill_bytes(&mut self, dest: &mut [u8]) {
-        impls::fill_bytes_via_next(self, dest)
+        impls::fill_bytes_via_next(self, dest);
     }
 
     fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), rand_core::Error> {
-        Ok(self.fill_bytes(dest))
+        self.fill_bytes(dest);
+        Ok(())
     }
 }
 
 impl CryptoRng for Generator {}
 
 pub struct ArgonHasher {
-    generator: Generator,
+    salt: SaltString,
 }
 
 impl ArgonHasher {
-    fn new() -> Self {
+    pub fn new(rng: RNG) -> Self {
         Self {
-            generator: Generator::new(),
+            salt: SaltString::generate(Generator::new(rng)),
         }
     }
 }
 
+impl ArgonHasher {}
+
 impl Hasher for ArgonHasher {
-    fn hash(
-        &self,
-        bytes: &crate::dexter_core::common::Password,
-    ) -> Box<crate::dexter_core::common::Hash> {
-        let salt = SaltString::generate(self.generator);
+    fn hash(&self, password: &Password) -> Hash {
         let argon = Argon2::default();
 
-        let password_hash = argon.hash_password(bytes, &salt)?;
-        Box::new(format(password_hash).as_bytes().to_owned())
+        let password_hash = argon
+            .hash_password(password.as_bytes(), &self.salt)
+            .unwrap();
+
+        password_hash.to_string()
     }
 
-    fn verify(
-        &self,
-        hash: &crate::dexter_core::common::Hash,
-        bytes: &crate::dexter_core::common::Password,
-    ) -> bool {
+    fn verify(&self, hash: &Hash, password: &Password) -> bool {
         let argon = Argon2::default();
-        argon.verify_password(bytes, hash).is_ok()
+
+        let passhash = PasswordHash::new(hash).unwrap();
+        argon
+            .verify_password(password.as_bytes(), &passhash)
+            .is_ok()
     }
 }
