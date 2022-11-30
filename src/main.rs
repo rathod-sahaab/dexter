@@ -10,7 +10,7 @@ use commons::{bounds::Bounds, logger::Logger};
 
 use alloc::format;
 
-use dexter_core::hasher::{argon_hasher::ArgonHasher, hasher::Hasher};
+use dexter_core::hasher::{argon_hasher::ArgonHasher, hasher::Hasher, no_hasher::NoHasher};
 use ui::progress::{gpio_progress_bar::GpioProgressBar, progress_bar::Progress};
 
 extern crate alloc;
@@ -65,7 +65,7 @@ fn main() -> ! {
     let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
 
     let mut led = io.pins.gpio25.into_push_pull_output();
-    let mut led2 = io.pins.gpio24.into_push_pull_output();
+    let mut led2 = io.pins.gpio26.into_push_pull_output();
 
     let mut progress_bar = GpioProgressBar::new([&mut led, &mut led2]);
 
@@ -81,18 +81,25 @@ fn main() -> ! {
 
     let mut delay = Delay::new(&clocks);
 
-    let argon = ArgonHasher::new(peripherals.RNG);
+    let no_hasher = NoHasher::default();
 
     let pass = String::from("Abhay");
 
     logger.logln("------------------ Allocated String ------------------");
 
-    let hash = argon.hash(&pass);
+    let hash = no_hasher.hash(&pass);
 
     logger.logln(format!("Hash: {}", hash.as_str()).as_str());
 
+    let mut prog = 0;
     loop {
-        progress_bar.show(Bounds { max: 1, min: 0 }, 1);
+        progress_bar.show(Bounds { max: 2, min: 0 }, prog);
+        prog += 1;
+
+        if prog > 2 {
+            prog = 0;
+        }
+
         delay.delay_ms(500u32);
     }
 }
