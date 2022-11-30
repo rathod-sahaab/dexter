@@ -5,8 +5,11 @@ mod commons;
 mod dexter_core;
 mod ui;
 
-use alloc::{string::String, vec};
-use commons::bounds::Bounds;
+use alloc::string::String;
+use commons::{bounds::Bounds, logger::Logger};
+
+use alloc::format;
+
 use dexter_core::hasher::{argon_hasher::ArgonHasher, hasher::Hasher};
 use ui::progress::{gpio_progress_bar::GpioProgressBar, progress_bar::Progress};
 
@@ -66,28 +69,30 @@ fn main() -> ! {
 
     let mut progress_bar = GpioProgressBar::new([&mut led, &mut led2]);
 
-    let mut serial0 = Serial::new(peripherals.UART0);
+    let serial0 = Serial::new(peripherals.UART0);
 
-    writeln!(
-        serial0,
-        "------------------- Started Program -----------------"
-    )
-    .unwrap();
+    let mut logger = Logger::new(serial0, &ALLOCATOR);
+
+    logger.logln("------------------ Started Program ------------------");
 
     init_heap();
 
-    writeln!(serial0, "Heap used: {}", ALLOCATOR.used()).unwrap();
+    logger.logln("------------------ INIT HEAP ------------------");
 
     let mut delay = Delay::new(&clocks);
 
     let argon = ArgonHasher::new(peripherals.RNG);
-    let hash = argon.hash(&String::from("Abhay"));
 
-    writeln!(serial0, "Hash: {}", hash).unwrap();
+    let pass = String::from("Abhay");
+
+    logger.logln("------------------ Allocated String ------------------");
+
+    let hash = argon.hash(&pass);
+
+    logger.logln(format!("Hash: {}", hash.as_str()).as_str());
 
     loop {
         progress_bar.show(Bounds { max: 1, min: 0 }, 1);
         delay.delay_ms(500u32);
-        writeln!(serial0, "Code is running!").unwrap();
     }
 }
