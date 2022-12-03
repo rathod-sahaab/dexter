@@ -3,25 +3,45 @@ pub mod hasher;
 pub mod store;
 
 use alloc::borrow::ToOwned;
-use common::{Hash, Password};
+use common::Password;
 
-pub struct Core<H: hasher::hasher::Hasher, S: store::HashStore> {
+pub trait Core<const DIGITS: usize> {
+    fn verify_password(&self, password: &Password<DIGITS>) -> bool;
+    fn set_password(
+        &mut self,
+        old_password: &Password<DIGITS>,
+        new_password: &Password<DIGITS>,
+    ) -> bool;
+}
+
+pub struct DefaultCore<
+    H: hasher::hasher::Hasher<DIGITS, HASH_LENGTH>,
+    S: store::HashStore<HASH_LENGTH>,
+    const DIGITS: usize,
+    const HASH_LENGTH: usize,
+> {
     max_password_size: u32,
-    password_hash: common::Hash,
+    password_hash: common::Hash<HASH_LENGTH>,
 
     hasher: H,
     hash_store: S,
 }
 
-impl<H: hasher::hasher::Hasher, S: store::HashStore> Core<H, S> {
+impl<
+        H: hasher::hasher::Hasher<DIGITS, HASH_LENGTH>,
+        S: store::HashStore<HASH_LENGTH>,
+        const DIGITS: usize,
+        const HASH_LENGTH: usize,
+    > DefaultCore<H, S, DIGITS, HASH_LENGTH>
+{
     pub fn new(
         max_password_size: u32,
         hasher: H,
         hash_store: S,
-        default_password: Password,
+        default_password: Password<DIGITS>,
     ) -> Self {
         let default_password_hash = hasher.hash(&default_password);
-        let password_hash: Hash = match hash_store.get() {
+        let password_hash = match hash_store.get() {
             Some(ph) => ph.to_owned(),
             None => default_password_hash,
         };
@@ -33,16 +53,24 @@ impl<H: hasher::hasher::Hasher, S: store::HashStore> Core<H, S> {
             password_hash,
         }
     }
+}
 
-    pub fn get_password_length(&self) -> u32 {
-        self.max_password_size
-    }
-
-    pub fn verify_password(&self, password: &Password) -> bool {
+impl<
+        H: hasher::hasher::Hasher<DIGITS, HASH_LENGTH>,
+        S: store::HashStore<HASH_LENGTH>,
+        const DIGITS: usize,
+        const HASH_LENGTH: usize,
+    > Core<DIGITS> for DefaultCore<H, S, DIGITS, HASH_LENGTH>
+{
+    fn verify_password(&self, password: &Password<DIGITS>) -> bool {
         self.hasher.verify(&self.password_hash, password)
     }
 
-    pub fn set_password(&mut self, old_password: &Password, new_password: &Password) -> bool {
+    fn set_password(
+        &mut self,
+        old_password: &Password<DIGITS>,
+        new_password: &Password<DIGITS>,
+    ) -> bool {
         if !self.verify_password(old_password) {
             return false;
         }

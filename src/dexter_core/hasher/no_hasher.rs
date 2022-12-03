@@ -5,12 +5,12 @@ use super::hasher::Hasher;
 #[derive(Default)]
 pub struct NoHasher {}
 
-impl Hasher for NoHasher {
-    fn hash(&self, password: &Password) -> Hash {
-        password.clone()
+impl<const DIGITS: usize> Hasher<DIGITS, DIGITS> for NoHasher {
+    fn hash(&self, password: &Password<DIGITS>) -> Hash<DIGITS> {
+        *password
     }
 
-    fn verify(&self, hash: &Hash, password: &Password) -> bool {
+    fn verify(&self, hash: &Hash<DIGITS>, password: &Password<DIGITS>) -> bool {
         hash.eq(password)
     }
 }

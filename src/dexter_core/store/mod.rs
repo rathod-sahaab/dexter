@@ -1,6 +1,6 @@
 use super::common::Hash;
 
-pub trait HashStore {
-    fn set(&self, array: &Hash);
-    fn get(&self) -> Option<&Hash>;
+pub trait HashStore<const DIGITS: usize> {
+    fn set(&self, array: &Hash<DIGITS>);
+    fn get(&self) -> Option<&Hash<DIGITS>>;
 }

@@ -53,23 +53,19 @@ impl ArgonHasher {
 
 impl ArgonHasher {}
 
-impl Hasher for ArgonHasher {
-    fn hash(&self, password: &Password) -> Hash {
+impl<const DIGITS: usize, const HASH_LENGTH: usize> Hasher<DIGITS, HASH_LENGTH> for ArgonHasher {
+    fn hash(&self, password: &Password<DIGITS>) -> Hash<HASH_LENGTH> {
         let argon = Argon2::default();
 
-        let password_hash = argon
-            .hash_password(password.as_bytes(), &self.salt)
-            .unwrap();
+        let password_hash = argon.hash_password(password, &self.salt).unwrap();
 
         password_hash.to_string()
     }
 
-    fn verify(&self, hash: &Hash, password: &Password) -> bool {
+    fn verify(&self, hash: &Hash<HASH_LENGTH>, password: &Password<DIGITS>) -> bool {
         let argon = Argon2::default();
 
         let passhash = PasswordHash::new(hash).unwrap();
-        argon
-            .verify_password(password.as_bytes(), &passhash)
-            .is_ok()
+        argon.verify_password(password, &passhash).is_ok()
     }
 }

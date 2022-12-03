@@ -17,11 +17,21 @@ impl<'a, const MAX_PINS: usize> GpioProgressBar<'a, MAX_PINS> {
 }
 
 impl<'a, const MAX_PINS: usize> Progress for GpioProgressBar<'a, MAX_PINS> {
-    fn show(&mut self, bounds: Bounds<usize>, current: usize) {
+    fn show_bounded(&mut self, bounds: Bounds<usize>, current: usize) {
         let progress = (MAX_PINS * (current - bounds.min)) / (bounds.max - bounds.min);
 
         for (i, pin) in self.pins.iter_mut().enumerate() {
             if i < progress {
+                pin.set_high().unwrap();
+            } else {
+                pin.set_low().unwrap();
+            }
+        }
+    }
+
+    fn show(&mut self, current: usize) {
+        for (i, pin) in self.pins.iter_mut().enumerate() {
+            if i < current {
                 pin.set_high().unwrap();
             } else {
                 pin.set_low().unwrap();

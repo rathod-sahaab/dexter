@@ -5,17 +5,10 @@ mod commons;
 mod dexter_core;
 mod ui;
 
-use alloc::string::String;
-use commons::{bounds::Bounds, logger::Logger};
-
-use alloc::format;
-
-use dexter_core::hasher::{argon_hasher::ArgonHasher, hasher::Hasher, no_hasher::NoHasher};
-use ui::progress::{gpio_progress_bar::GpioProgressBar, progress_bar::Progress};
+use ui::progress::gpio_progress_bar::GpioProgressBar;
 
 extern crate alloc;
 
-use core::fmt::Write;
 use esp32_hal::{
     clock::ClockControl, gpio::IO, pac::Peripherals, prelude::*, timer::TimerGroup, Delay, Rtc,
     Serial,
@@ -50,6 +43,8 @@ fn main() -> ! {
     let system = peripherals.DPORT.split();
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
 
+    let serial0 = Serial::new(peripherals.UART0);
+
     // Disable the RTC and TIMG watchdog timers
     let mut rtc = Rtc::new(peripherals.RTC_CNTL);
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);
@@ -64,42 +59,5 @@ fn main() -> ! {
     // Real code begins
     let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
 
-    let mut led = io.pins.gpio25.into_push_pull_output();
-    let mut led2 = io.pins.gpio26.into_push_pull_output();
-
-    let mut progress_bar = GpioProgressBar::new([&mut led, &mut led2]);
-
-    let serial0 = Serial::new(peripherals.UART0);
-
-    let mut logger = Logger::new(serial0, &ALLOCATOR);
-
-    logger.logln("------------------ Started Program ------------------");
-
-    init_heap();
-
-    logger.logln("------------------ INIT HEAP ------------------");
-
-    let mut delay = Delay::new(&clocks);
-
-    let no_hasher = NoHasher::default();
-
-    let pass = String::from("Abhay");
-
-    logger.logln("------------------ Allocated String ------------------");
-
-    let hash = no_hasher.hash(&pass);
-
-    logger.logln(format!("Hash: {}", hash.as_str()).as_str());
-
-    let mut prog = 0;
-    loop {
-        progress_bar.show(Bounds { max: 2, min: 0 }, prog);
-        prog += 1;
-
-        if prog > 2 {
-            prog = 0;
-        }
-
-        delay.delay_ms(500u32);
-    }
+    loop {}
 }
