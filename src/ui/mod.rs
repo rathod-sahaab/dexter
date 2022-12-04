@@ -1,4 +1,4 @@
-use crate::dexter_core::Core;
+use crate::dexter_core::{common::Renderable, Core};
 
 use self::{
     keypad::keypad::Keypad, progress::progress_bar::Progress,
@@ -11,7 +11,7 @@ pub mod success_failure_indicator;
 
 struct UI<
     P: Progress,
-    I: SuccessFailureIndicator,
+    I: SuccessFailureIndicator + Renderable,
     K: Keypad<KEYS>,
     const KEYS: usize,
     const DIGITS: usize,
@@ -33,7 +33,7 @@ struct UI<
 
 impl<
         P: Progress,
-        I: SuccessFailureIndicator,
+        I: SuccessFailureIndicator + Renderable,
         K: Keypad<KEYS>,
         const KEYS: usize,
         const DIGITS: usize,
@@ -56,39 +56,61 @@ impl<
     fn reset(&mut self) {
         self.cursor = 0;
         self.prev_key_presses = [false; KEYS];
+        self.combination = [0; DIGITS];
         self.prev_key_presses_true_count = 0;
     }
 
     pub fn cycle(&mut self) {
+        // input
         let key_presses = self.keypad.read();
 
+        // compute
         let true_count = count_trues(&key_presses);
 
-        if true_count == 0 && self.prev_key_presses_true_count != 0 {
-            // set prev data
-            self.prev_key_presses_true_count = 0;
-            self.prev_key_presses = [false; KEYS];
+        if true_count == 0 {
+            if self.prev_key_presses_true_count != 0 {
+                // Registering last key entry
+                self.combination[self.cursor] = binary_to_num::<KEYS>(&self.prev_key_presses);
 
-            // Digit entered
-            self.cursor += 1;
+                // Clearing noted key press
+                self.prev_key_presses_true_count = 0;
+                self.prev_key_presses = [false; KEYS];
 
-            self.progress.show(self.cursor);
+                // Updating stage
+                self.cursor += 1;
 
-            if self.cursor == DIGITS {
-                self.core.verify_password(&self.combination);
+                // passing to core
+                if self.cursor == DIGITS {
+                    if self.core.verify_password(&self.combination) {
+                        self.sfi.set_success(true);
+                    } else {
+                        self.sfi.set_success(false);
+                        // TODO: Reset state to listen for password again
+                    }
+                    self.sfi.set_visible(true);
+                }
             }
-
-            if self.cursor >= DIGITS {
-                self.reset();
-                return;
-            }
-        } else if self.prev_key_presses_true_count <= true_count {
-            self.prev_key_presses = key_presses;
+        } else if true_count >= self.prev_key_presses_true_count {
             self.prev_key_presses_true_count = true_count;
+            self.prev_key_presses = key_presses;
         }
+
+        // renders
+        self.sfi.render();
+        self.progress.show(self.cursor)
     }
 }
 
 fn count_trues<const LENGTH: usize>(arr: &[bool; LENGTH]) -> usize {
     arr.iter().filter(|key_press| **key_press).count()
+}
+
+fn binary_to_num<const LENGTH: usize>(arr: &[bool; LENGTH]) -> u8 {
+    arr.iter().enumerate().fold(0u8, |accum: u8, (i, val)| {
+        accum
+            + match val {
+                true => 2u8.pow(i.try_into().unwrap()),
+                false => 0,
+            }
+    })
 }

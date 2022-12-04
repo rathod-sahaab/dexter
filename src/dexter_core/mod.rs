@@ -20,7 +20,6 @@ pub struct DefaultCore<
     const DIGITS: usize,
     const HASH_LENGTH: usize,
 > {
-    max_password_size: u32,
     password_hash: common::Hash<HASH_LENGTH>,
 
     hasher: H,
@@ -34,12 +33,7 @@ impl<
         const HASH_LENGTH: usize,
     > DefaultCore<H, S, DIGITS, HASH_LENGTH>
 {
-    pub fn new(
-        max_password_size: u32,
-        hasher: H,
-        hash_store: S,
-        default_password: Password<DIGITS>,
-    ) -> Self {
+    pub fn new(hasher: H, hash_store: S, default_password: Password<DIGITS>) -> Self {
         let default_password_hash = hasher.hash(&default_password);
         let password_hash = match hash_store.get() {
             Some(ph) => ph.to_owned(),
@@ -47,7 +41,6 @@ impl<
         };
 
         Self {
-            max_password_size,
             hasher,
             hash_store,
             password_hash,

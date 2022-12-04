@@ -1,3 +1,7 @@
 pub trait SuccessFailureIndicator {
-    fn show(&mut self, show: bool, success: bool);
+    /**
+     * This works like a latch i.e. remembers it's previous value.
+     */
+    fn set_visible(&mut self, visible: bool);
+    fn set_success(&mut self, success: bool);
 }
