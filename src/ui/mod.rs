@@ -9,6 +9,7 @@ pub mod keypad;
 pub mod progress;
 pub mod success_failure_indicator;
 
+// TODO: Add state to account for PASSWORD_RESET, LOCKED, OPEN
 struct UI<
     P: Progress,
     I: SuccessFailureIndicator + Renderable,
@@ -22,6 +23,7 @@ struct UI<
     sfi: I,
     keypad: K,
     core: C,
+    // TODO: add bolt/shackle part witch opens and closes
 
     // Members
     cursor: usize,
