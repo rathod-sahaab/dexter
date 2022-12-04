@@ -9,7 +9,7 @@ pub struct GpioKeypad<'a, const MAX_PINS: usize> {
 }
 
 impl<'a, const MAX_PINS: usize> GpioKeypad<'a, MAX_PINS> {
-    fn new(pins: [&'a dyn InputPin<Error = Infallible>; MAX_PINS]) -> Self {
+    pub fn new(pins: [&'a dyn InputPin<Error = Infallible>; MAX_PINS]) -> Self {
         Self { pins }
     }
 }

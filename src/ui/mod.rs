@@ -10,7 +10,7 @@ pub mod progress;
 pub mod success_failure_indicator;
 
 // TODO: Add state to account for PASSWORD_RESET, LOCKED, OPEN
-struct UI<
+pub struct UI<
     P: Progress,
     I: SuccessFailureIndicator + Renderable,
     K: Keypad<KEYS>,
@@ -87,6 +87,7 @@ impl<
                         self.sfi.set_success(true);
                     } else {
                         self.sfi.set_success(false);
+                        self.reset();
                         // TODO: Reset state to listen for password again
                     }
                     self.sfi.set_visible(true);

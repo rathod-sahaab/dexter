@@ -11,10 +11,23 @@ pub struct GpioSuccessFailureIndicator<
     U: OutputPin<Error = Infallible>,
 > {
     success_pin: T,
-    faiure_pin: U,
+    failure_pin: U,
 
     visible: bool,
     success: bool,
+}
+
+impl<T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>>
+    GpioSuccessFailureIndicator<T, U>
+{
+    pub fn new(success_pin: T, failure_pin: U) -> Self {
+        Self {
+            success_pin,
+            failure_pin,
+            visible: false,
+            success: false,
+        }
+    }
 }
 
 impl<T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>> Renderable
@@ -31,9 +44,9 @@ impl<T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>> Rendera
         }
 
         if show_faliure {
-            self.faiure_pin.set_high().unwrap();
+            self.failure_pin.set_high().unwrap();
         } else {
-            self.faiure_pin.set_low().unwrap();
+            self.failure_pin.set_low().unwrap();
         }
     }
 }

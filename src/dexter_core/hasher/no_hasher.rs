@@ -5,6 +5,12 @@ use super::hasher::Hasher;
 #[derive(Default)]
 pub struct NoHasher {}
 
+impl NoHasher {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 impl<const DIGITS: usize> Hasher<DIGITS, DIGITS> for NoHasher {
     fn hash(&self, password: &Password<DIGITS>) -> Hash<DIGITS> {
         *password
