@@ -7,11 +7,7 @@ use common::Password;
 
 pub trait Core<const DIGITS: usize> {
     fn verify_password(&self, password: &Password<DIGITS>) -> bool;
-    fn set_password(
-        &mut self,
-        old_password: &Password<DIGITS>,
-        new_password: &Password<DIGITS>,
-    ) -> bool;
+    fn set_password(&mut self, new_password: &Password<DIGITS>) -> bool;
 }
 
 pub struct DefaultCore<
@@ -59,15 +55,7 @@ impl<
         self.hasher.verify(&self.password_hash, password)
     }
 
-    fn set_password(
-        &mut self,
-        old_password: &Password<DIGITS>,
-        new_password: &Password<DIGITS>,
-    ) -> bool {
-        if !self.verify_password(old_password) {
-            return false;
-        }
-
+    fn set_password(&mut self, new_password: &Password<DIGITS>) -> bool {
         self.password_hash = self.hasher.hash(new_password);
 
         self.hash_store.set(&self.password_hash);

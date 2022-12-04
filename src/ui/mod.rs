@@ -73,6 +73,20 @@ impl<
         self.prev_key_presses_true_count = 0;
     }
 
+    fn set_state(&mut self, state: UiState) {
+        match state {
+            UiState::Locked => {
+                self.state = UiState::Locked;
+            }
+            UiState::Open => {
+                self.state = UiState::Open;
+            }
+            UiState::PasswordChange => {
+                self.state = UiState::PasswordChange;
+            }
+        }
+    }
+
     pub fn cycle(&mut self) {
         match self.state {
             UiState::Locked => self.locked_cycle(),
@@ -104,9 +118,10 @@ impl<
                 if self.cursor == DIGITS {
                     if self.core.verify_password(&self.combination) {
                         self.sfi.set_success(true);
+                        self.set_state(UiState::Open)
                     } else {
                         self.sfi.set_success(false);
-                        self.reset();
+                        self.set_state(UiState::Locked);
                         // TODO: Reset state to listen for password again
                     }
                     self.sfi.set_visible(true);
@@ -122,9 +137,81 @@ impl<
         self.progress.show(self.cursor)
     }
 
-    fn open_cycle(&mut self) {}
+    fn open_cycle(&mut self) {
+        // input
+        let key_presses = self.keypad.read();
 
-    fn password_change_cycle(&mut self) {}
+        // compute
+        let true_count = count_trues(&key_presses);
+
+        if true_count == 0 {
+            if self.prev_key_presses_true_count != 0 {
+                if let Some(true) = self.prev_key_presses.first() {
+                    self.set_state(UiState::Locked);
+                } else if self.prev_key_presses_true_count == DIGITS {
+                    self.set_state(UiState::PasswordChange);
+                }
+
+                // Clearing noted key press
+                self.prev_key_presses_true_count = 0;
+                self.prev_key_presses = [false; KEYS];
+            }
+        } else if true_count >= self.prev_key_presses_true_count {
+            self.prev_key_presses_true_count = true_count;
+            self.prev_key_presses = key_presses;
+        }
+
+        // renders
+        self.sfi.render();
+        self.progress.show(self.cursor)
+    }
+
+    fn password_change_cycle(&mut self) {
+        // input
+        let key_presses = self.keypad.read();
+
+        // compute
+        let true_count = count_trues(&key_presses);
+
+        if true_count == 0 {
+            if self.prev_key_presses_true_count != 0 {
+                // Registering last key entry
+                self.combination[self.cursor] = binary_to_num::<KEYS>(&self.prev_key_presses);
+
+                if self.prev_key_presses_true_count == DIGITS {
+                    // Cancel password change
+                    self.set_state(UiState::Open);
+                }
+
+                // Clearing noted key press
+                self.prev_key_presses_true_count = 0;
+                self.prev_key_presses = [false; KEYS];
+
+                // Updating stage
+                self.cursor += 1;
+
+                // passing to core
+                if self.cursor == DIGITS {
+                    if self.core.set_password(&self.combination) {
+                        self.sfi.set_success(true);
+                        self.set_state(UiState::Locked);
+                    } else {
+                        self.sfi.set_success(false);
+                        self.reset();
+                        self.set_state(UiState::PasswordChange);
+                    }
+                    self.sfi.set_visible(true);
+                }
+            }
+        } else if true_count >= self.prev_key_presses_true_count {
+            self.prev_key_presses_true_count = true_count;
+            self.prev_key_presses = key_presses;
+        }
+
+        // renders
+        self.sfi.render();
+        self.progress.show(self.cursor)
+    }
 }
 
 fn count_trues<const LENGTH: usize>(arr: &[bool; LENGTH]) -> usize {
