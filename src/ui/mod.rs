@@ -9,6 +9,12 @@ pub mod keypad;
 pub mod progress;
 pub mod success_failure_indicator;
 
+pub enum UiState {
+    Locked,
+    Open,
+    PasswordChange,
+}
+
 // TODO: Add state to account for PASSWORD_RESET, LOCKED, OPEN
 pub struct UI<
     P: Progress,
@@ -26,6 +32,7 @@ pub struct UI<
     // TODO: add bolt/shackle part witch opens and closes
 
     // Members
+    state: UiState,
     cursor: usize,
     prev_key_presses: [bool; KEYS],
     prev_key_presses_true_count: usize,
@@ -44,10 +51,14 @@ impl<
 {
     pub fn new(progress: P, sfi: I, keypad: K, core: C) -> Self {
         Self {
+            // dependencies
             progress,
             sfi,
             keypad,
             core,
+
+            // members
+            state: UiState::Locked,
             cursor: 0,
             prev_key_presses: [false; KEYS],
             prev_key_presses_true_count: 0,
@@ -63,6 +74,14 @@ impl<
     }
 
     pub fn cycle(&mut self) {
+        match self.state {
+            UiState::Locked => self.locked_cycle(),
+            UiState::Open => self.open_cycle(),
+            UiState::PasswordChange => self.password_change_cycle(),
+        }
+    }
+
+    fn locked_cycle(&mut self) {
         // input
         let key_presses = self.keypad.read();
 
@@ -102,6 +121,10 @@ impl<
         self.sfi.render();
         self.progress.show(self.cursor)
     }
+
+    fn open_cycle(&mut self) {}
+
+    fn password_change_cycle(&mut self) {}
 }
 
 fn count_trues<const LENGTH: usize>(arr: &[bool; LENGTH]) -> usize {
