@@ -1,6 +1,6 @@
 use crate::dexter_core::common::{Hash, Password};
 
-use super::hasher::Hasher;
+use super::Hasher;
 
 #[derive(Default)]
 pub struct NoHasher {}

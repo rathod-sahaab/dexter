@@ -2,7 +2,7 @@ use core::convert::Infallible;
 
 use esp32_hal::prelude::_embedded_hal_digital_v2_InputPin as InputPin;
 
-use super::keypad::Keypad;
+use super::Keypad;
 
 pub struct GpioKeypad<'a, const MAX_PINS: usize> {
     pins: [&'a dyn InputPin<Error = Infallible>; MAX_PINS],

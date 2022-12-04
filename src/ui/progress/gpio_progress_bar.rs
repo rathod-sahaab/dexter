@@ -4,7 +4,7 @@ use esp32_hal::prelude::_embedded_hal_digital_v2_OutputPin as OutputPin;
 
 use crate::commons::bounds::Bounds;
 
-use super::progress_bar::Progress;
+use super::ProgressBar;
 
 pub struct GpioProgressBar<'a, const MAX_PINS: usize> {
     pins: [&'a mut dyn OutputPin<Error = Infallible>; MAX_PINS],
@@ -16,7 +16,7 @@ impl<'a, const MAX_PINS: usize> GpioProgressBar<'a, MAX_PINS> {
     }
 }
 
-impl<'a, const MAX_PINS: usize> Progress for GpioProgressBar<'a, MAX_PINS> {
+impl<'a, const MAX_PINS: usize> ProgressBar for GpioProgressBar<'a, MAX_PINS> {
     fn show_bounded(&mut self, bounds: Bounds<usize>, current: usize) {
         let progress = (MAX_PINS * (current - bounds.min)) / (bounds.max - bounds.min);
 

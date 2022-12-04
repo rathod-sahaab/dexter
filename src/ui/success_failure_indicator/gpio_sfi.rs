@@ -4,7 +4,7 @@ use esp32_hal::prelude::_embedded_hal_digital_v2_OutputPin as OutputPin;
 
 use crate::dexter_core::common::Renderable;
 
-use super::sfi::SuccessFailureIndicator;
+use super::SuccessFailureIndicator;
 
 pub struct GpioSuccessFailureIndicator<
     T: OutputPin<Error = Infallible>,

@@ -1,8 +1,7 @@
 use crate::dexter_core::{common::Renderable, Core};
 
 use self::{
-    keypad::keypad::Keypad, progress::progress_bar::Progress,
-    success_failure_indicator::sfi::SuccessFailureIndicator,
+    keypad::Keypad, progress::ProgressBar, success_failure_indicator::SuccessFailureIndicator,
 };
 
 pub mod keypad;
@@ -17,7 +16,7 @@ pub enum UiState {
 
 // TODO: Add state to account for PASSWORD_RESET, LOCKED, OPEN
 pub struct UI<
-    P: Progress,
+    P: ProgressBar,
     I: SuccessFailureIndicator + Renderable,
     K: Keypad<KEYS>,
     const KEYS: usize,
@@ -41,7 +40,7 @@ pub struct UI<
 }
 
 impl<
-        P: Progress,
+        P: ProgressBar,
         I: SuccessFailureIndicator + Renderable,
         K: Keypad<KEYS>,
         const KEYS: usize,

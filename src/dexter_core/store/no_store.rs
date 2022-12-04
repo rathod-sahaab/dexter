@@ -1,4 +1,4 @@
-use super::store::HashStore;
+use super::HashStore;
 
 pub struct NoStore {}
 

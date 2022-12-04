@@ -11,8 +11,8 @@ pub trait Core<const DIGITS: usize> {
 }
 
 pub struct DefaultCore<
-    H: hasher::hasher::Hasher<DIGITS, HASH_LENGTH>,
-    S: store::store::HashStore<HASH_LENGTH>,
+    H: hasher::Hasher<DIGITS, HASH_LENGTH>,
+    S: store::HashStore<HASH_LENGTH>,
     const DIGITS: usize,
     const HASH_LENGTH: usize,
 > {
@@ -23,8 +23,8 @@ pub struct DefaultCore<
 }
 
 impl<
-        H: hasher::hasher::Hasher<DIGITS, HASH_LENGTH>,
-        S: store::store::HashStore<HASH_LENGTH>,
+        H: hasher::Hasher<DIGITS, HASH_LENGTH>,
+        S: store::HashStore<HASH_LENGTH>,
         const DIGITS: usize,
         const HASH_LENGTH: usize,
     > DefaultCore<H, S, DIGITS, HASH_LENGTH>
@@ -45,8 +45,8 @@ impl<
 }
 
 impl<
-        H: hasher::hasher::Hasher<DIGITS, HASH_LENGTH>,
-        S: store::store::HashStore<HASH_LENGTH>,
+        H: hasher::Hasher<DIGITS, HASH_LENGTH>,
+        S: store::HashStore<HASH_LENGTH>,
         const DIGITS: usize,
         const HASH_LENGTH: usize,
     > Core<DIGITS> for DefaultCore<H, S, DIGITS, HASH_LENGTH>
