@@ -1,15 +1,18 @@
 use core::convert::Infallible;
 
-use esp32_hal::prelude::_embedded_hal_digital_v2_OutputPin as OutputPin;
+use esp32_hal::{prelude::_embedded_hal_digital_v2_OutputPin as OutputPin, Delay};
 
 use crate::dexter_core::common::Renderable;
 
 use super::SuccessFailureIndicator;
 
 pub struct GpioSuccessFailureIndicator<
+    'a,
     T: OutputPin<Error = Infallible>,
     U: OutputPin<Error = Infallible>,
 > {
+    delay: &'a Delay,
+
     success_pin: T,
     failure_pin: U,
 
@@ -17,11 +20,12 @@ pub struct GpioSuccessFailureIndicator<
     success: bool,
 }
 
-impl<T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>>
-    GpioSuccessFailureIndicator<T, U>
+impl<'a, T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>>
+    GpioSuccessFailureIndicator<'a, T, U>
 {
-    pub fn new(success_pin: T, failure_pin: U) -> Self {
+    pub fn new(success_pin: T, failure_pin: U, delay: &'a Delay) -> Self {
         Self {
+            delay,
             success_pin,
             failure_pin,
             visible: false,
@@ -30,8 +34,8 @@ impl<T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>>
     }
 }
 
-impl<T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>> Renderable
-    for GpioSuccessFailureIndicator<T, U>
+impl<'a, T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>> Renderable
+    for GpioSuccessFailureIndicator<'a, T, U>
 {
     fn render(&mut self) {
         let show_success = self.visible && self.success;
@@ -48,11 +52,16 @@ impl<T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>> Rendera
         } else {
             self.failure_pin.set_low().unwrap();
         }
+
+        if show_faliure {
+            self.delay.delay(3 * 1_000_000);
+            self.visible = false;
+        }
     }
 }
 
-impl<T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>> SuccessFailureIndicator
-    for GpioSuccessFailureIndicator<T, U>
+impl<'a, T: OutputPin<Error = Infallible>, U: OutputPin<Error = Infallible>> SuccessFailureIndicator
+    for GpioSuccessFailureIndicator<'a, T, U>
 {
     fn set_visible(&mut self, visible: bool) {
         self.visible = visible;

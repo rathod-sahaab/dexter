@@ -19,9 +19,10 @@ use esp32_hal::{
     pac::Peripherals,
     prelude::*,
     timer::TimerGroup,
-    Rtc,
+    Delay,
     // Delay,
     // Serial,
+    Rtc,
 };
 
 use esp_backtrace as _;
@@ -65,6 +66,8 @@ fn main() -> ! {
     let timer_group1 = TimerGroup::new(peripherals.TIMG1, &clocks);
     let mut wdt1 = timer_group1.wdt;
 
+    let delay = Delay::new(&clocks);
+
     rtc.rwdt.disable();
     wdt0.disable();
     wdt1.disable();
@@ -103,6 +106,7 @@ fn main() -> ! {
     let sfi = GpioSuccessFailureIndicator::new(
         io.pins.gpio23.into_push_pull_output(),
         io.pins.gpio22.into_push_pull_output(),
+        &delay,
     );
 
     let mut keypad_key_0 = io.pins.gpio27.into_pull_down_input();
