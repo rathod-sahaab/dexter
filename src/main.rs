@@ -26,8 +26,9 @@ use esp32_hal::{
 };
 
 use esp_backtrace as _;
+use ui::contracts::stateful_devices::input::stateful_keypad::StatefulKeypad;
 
-use crate::dexter_core::{store::no_store::NoStore, DefaultCore};
+use crate::dexter_core::{store::no_store::NoStore, Core, DefaultCore};
 #[global_allocator]
 static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
 
@@ -88,6 +89,14 @@ fn execute(io: IO, delay: Delay) -> ! {
     let core = DefaultCore::new(hasher, store, [3; DIGITS]);
 
     loop {
-        // ui.cycle()
+
+        // core.set_password(new_password)
+    }
+}
+
+fn looper<const KEYS: usize>(keypad: &impl StatefulKeypad<KEYS>) {
+    if let Some(values) = keypad.get() {
+        // append to passoword
+        // core.verify_password(password)
     }
 }
