@@ -1,5 +1,3 @@
-pub mod gpio_progress_bar;
-
 use crate::commons::bounds::Bounds;
 
 pub trait ProgressBar {

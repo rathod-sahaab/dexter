@@ -5,17 +5,17 @@ mod commons;
 mod dexter_core;
 mod ui;
 
+use core::convert::Infallible;
+
+use argon2::Error;
 use dexter_core::hasher::no_hasher::NoHasher;
-use ui::{
-    keypad::gpio_keypad::GpioKeypad, progress::gpio_progress_bar::GpioProgressBar,
-    success_failure_indicator::gpio_sfi::GpioSuccessFailureIndicator, UI,
-};
 
 extern crate alloc;
 
 use esp32_hal::{
     clock::ClockControl,
     gpio::IO,
+    gpio_types::OutputPin,
     pac::Peripherals,
     prelude::*,
     timer::TimerGroup,
@@ -74,7 +74,10 @@ fn main() -> ! {
 
     let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
 
-    // Real code begins
+    execute(io, delay)
+}
+
+fn execute(io: IO, delay: Delay) -> ! {
     const DIGITS: usize = 5;
     const KEYS: usize = 4;
 
@@ -84,47 +87,7 @@ fn main() -> ! {
 
     let core = DefaultCore::new(hasher, store, [3; DIGITS]);
 
-    // -------  UI  -------
-    // progress bar
-    //  avoiding error[E0716]: temporary value dropped while borrowed
-
-    let mut progress_led_0 = io.pins.gpio21.into_push_pull_output();
-    let mut progress_led_1 = io.pins.gpio19.into_push_pull_output();
-    let mut progress_led_2 = io.pins.gpio18.into_push_pull_output();
-    let mut progress_led_3 = io.pins.gpio5.into_push_pull_output();
-    let mut progress_led_4 = io.pins.gpio17.into_push_pull_output();
-
-    let progress = GpioProgressBar::<DIGITS>::new([
-        // order is critical
-        &mut progress_led_0,
-        &mut progress_led_1,
-        &mut progress_led_2,
-        &mut progress_led_3,
-        &mut progress_led_4,
-    ]);
-
-    let sfi = GpioSuccessFailureIndicator::new(
-        io.pins.gpio23.into_push_pull_output(),
-        io.pins.gpio22.into_push_pull_output(),
-        &delay,
-    );
-
-    let mut keypad_key_0 = io.pins.gpio27.into_pull_down_input();
-    let mut keypad_key_1 = io.pins.gpio14.into_pull_down_input();
-    let mut keypad_key_2 = io.pins.gpio12.into_pull_down_input();
-    let mut keypad_key_3 = io.pins.gpio13.into_pull_down_input();
-
-    let keypad = GpioKeypad::<KEYS>::new([
-        // order or this array is critical
-        &mut keypad_key_0,
-        &mut keypad_key_1,
-        &mut keypad_key_2,
-        &mut keypad_key_3,
-    ]);
-
-    let mut ui = UI::new(progress, sfi, keypad, core);
-
     loop {
-        ui.cycle()
+        // ui.cycle()
     }
 }
