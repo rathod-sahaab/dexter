@@ -1,5 +1,3 @@
-use esp32_hal::ehal::digital;
-
 use crate::{
     dexter_core::{common::Password, Core},
     ui::contracts::InputUI,
