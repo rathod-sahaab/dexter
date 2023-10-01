@@ -1,17 +1,11 @@
 use super::{
+    application_state::ApplicationState,
     core::DexterCore,
     traits::{
         secrets::password::Password,
         ui::{DigitKeysValue, InputUI},
     },
 };
-
-pub enum ApplicationState {
-    Locked,
-    PasswordListening,
-    Unlocked,
-    PasswordBuilding,
-}
 
 pub struct Application<
     const DIGITS: usize,
