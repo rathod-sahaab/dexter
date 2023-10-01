@@ -1,13 +1,11 @@
 #![no_std]
 #![no_main]
 
+mod application;
 mod commons;
 mod dexter_core;
 mod ui;
 
-use core::convert::Infallible;
-
-use argon2::Error;
 use dexter_core::hasher::no_hasher::NoHasher;
 
 extern crate alloc;
@@ -15,7 +13,6 @@ extern crate alloc;
 use esp32_hal::{
     clock::ClockControl,
     gpio::IO,
-    gpio_types::OutputPin,
     pac::Peripherals,
     prelude::*,
     timer::TimerGroup,
@@ -26,7 +23,6 @@ use esp32_hal::{
 };
 
 use esp_backtrace as _;
-use ui::contracts::stateful_devices::input::stateful_keypad::StatefulKeypad;
 
 use crate::dexter_core::{store::no_store::NoStore, Core, DefaultCore};
 #[global_allocator]
@@ -88,15 +84,7 @@ fn execute(io: IO, delay: Delay) -> ! {
 
     let core = DefaultCore::new(hasher, store, [3; DIGITS]);
 
-    loop {
+    // looper::<KEYS>(keypad);
 
-        // core.set_password(new_password)
-    }
-}
-
-fn looper<const KEYS: usize>(keypad: &impl StatefulKeypad<KEYS>) {
-    if let Some(values) = keypad.get() {
-        // append to passoword
-        // core.verify_password(password)
-    }
+    loop {}
 }
