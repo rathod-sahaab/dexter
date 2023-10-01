@@ -1,6 +1,6 @@
-pub mod no_hasher;
+use super::password::Password;
 
-use crate::dexter_core::common::{Hash, Password};
+pub type Hash<const LENGTH: usize> = [u8; LENGTH];
 
 pub trait Hasher<const DIGITS: usize, const HASH_LENGTH: usize> {
     // Hash bytes, produce one-way encrypted constant length hash.

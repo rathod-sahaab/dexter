@@ -1,10 +1,8 @@
 #![no_std]
 #![no_main]
 
-mod application;
 mod commons;
 mod dexter_core;
-mod ui;
 
 extern crate alloc;
 use core::mem::MaybeUninit;

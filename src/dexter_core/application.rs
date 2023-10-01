@@ -1,6 +1,6 @@
-use crate::{
-    dexter_core::{common::Password, Core},
-    ui::contracts::InputUI,
+use super::{
+    core::DexterCore,
+    traits::{secrets::password::Password, ui::InputUI},
 };
 
 pub enum ApplicationState {
@@ -13,12 +13,11 @@ pub enum ApplicationState {
 pub struct Application<
     const DIGITS: usize,
     const KEYS: usize,
-    I: InputUI<DIGITS, KEYS>,
-    C: Core<DIGITS>,
+    Input: InputUI<DIGITS, KEYS>,
+    C: DexterCore<DIGITS>,
 > {
     state: ApplicationState,
-    // static dispatch
-    input: I,
+    input: Input,
     core: C,
 }
 
@@ -38,7 +37,7 @@ fn from<const DIGITS: usize, const KEYS: usize>(data: [[bool; KEYS]; DIGITS]) ->
     })
 }
 
-impl<const DIGITS: usize, const KEYS: usize, I: InputUI<DIGITS, KEYS>, C: Core<DIGITS>>
+impl<const DIGITS: usize, const KEYS: usize, I: InputUI<DIGITS, KEYS>, C: DexterCore<DIGITS>>
     Application<DIGITS, KEYS, I, C>
 {
     fn password_reset_code(keys: [bool; KEYS]) -> bool {

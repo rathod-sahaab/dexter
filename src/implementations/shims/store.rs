@@ -1,5 +1,3 @@
-use super::HashStore;
-
 pub struct NoStore {}
 
 impl NoStore {

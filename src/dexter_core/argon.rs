@@ -1,3 +1,4 @@
+// TODO: platform dependent as generic parameters
 use crate::dexter_core::common::{Hash, Password};
 use alloc::string::ToString;
 use argon2::{password_hash::SaltString, Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
