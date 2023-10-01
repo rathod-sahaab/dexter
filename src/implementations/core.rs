@@ -1,6 +1,17 @@
+use crate::dexter_core::{
+    core::DexterCore,
+    traits::{
+        secrets::{
+            hasher::{Hash, Hasher},
+            password::Password,
+        },
+        store::HashStore,
+    },
+};
+
 pub struct DefaultCore<
     H: Hasher<DIGITS, HASH_LENGTH>,
-    S: store::HashStore<HASH_LENGTH>,
+    S: HashStore<HASH_LENGTH>,
     const DIGITS: usize,
     const HASH_LENGTH: usize,
 > {
@@ -12,7 +23,7 @@ pub struct DefaultCore<
 
 impl<
         H: Hasher<DIGITS, HASH_LENGTH>,
-        S: store::HashStore<HASH_LENGTH>,
+        S: HashStore<HASH_LENGTH>,
         const DIGITS: usize,
         const HASH_LENGTH: usize,
     > DefaultCore<H, S, DIGITS, HASH_LENGTH>
@@ -34,7 +45,7 @@ impl<
 
 impl<
         H: Hasher<DIGITS, HASH_LENGTH>,
-        S: store::HashStore<HASH_LENGTH>,
+        S: HashStore<HASH_LENGTH>,
         const DIGITS: usize,
         const HASH_LENGTH: usize,
     > DexterCore<DIGITS> for DefaultCore<H, S, DIGITS, HASH_LENGTH>

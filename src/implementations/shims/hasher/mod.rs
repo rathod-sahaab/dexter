@@ -1,1 +1,2 @@
-pub mod no_hasher;
+pub mod shim_hasher;
+

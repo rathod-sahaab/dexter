@@ -1,4 +1,4 @@
-use crate::ui::contracts::InputUI;
+use crate::dexter_core::traits::ui::InputUI;
 
 struct ShimInputUI<const DIGITS: usize, const KEYS: usize> {}
 

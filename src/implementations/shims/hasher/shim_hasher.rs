@@ -1,3 +1,8 @@
+use crate::dexter_core::traits::secrets::{
+    hasher::{Hash, Hasher},
+    password::Password,
+};
+
 #[derive(Default)]
 pub struct NoHasher {}
 
