@@ -1,13 +1,13 @@
-use crate::dexter_core::traits::ui::InputUI;
+use crate::dexter_core::traits::ui::{DigitKeysValue, InputUI, KeysValue};
 
 struct ShimInputUI<const DIGITS: usize, const KEYS: usize> {}
 
 impl<const DIGITS: usize, const KEYS: usize> InputUI<DIGITS, KEYS> for ShimInputUI<DIGITS, KEYS> {
-    fn digits_input(&self) -> Option<[[bool; KEYS]; DIGITS]> {
+    fn digits_input(&self) -> Option<DigitKeysValue<DIGITS, KEYS>> {
         Some([[false; KEYS]; DIGITS])
     }
 
-    fn keys_input(&self) -> Option<[bool; KEYS]> {
+    fn keys_input(&self) -> Option<KeysValue<KEYS>> {
         Some([false; KEYS])
     }
 }

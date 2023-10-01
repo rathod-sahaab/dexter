@@ -1,6 +1,9 @@
 use super::{
     core::DexterCore,
-    traits::{secrets::password::Password, ui::InputUI},
+    traits::{
+        secrets::password::Password,
+        ui::{DigitKeysValue, InputUI},
+    },
 };
 
 pub enum ApplicationState {
@@ -21,7 +24,9 @@ pub struct Application<
     core: C,
 }
 
-fn from<const DIGITS: usize, const KEYS: usize>(data: [[bool; KEYS]; DIGITS]) -> Password<DIGITS> {
+fn to_dexter_password<const DIGITS: usize, const KEYS: usize>(
+    data: DigitKeysValue<DIGITS, KEYS>,
+) -> Password<DIGITS> {
     data.map(|digit_keys| {
         digit_keys
             .into_iter()
@@ -63,7 +68,7 @@ impl<const DIGITS: usize, const KEYS: usize, I: InputUI<DIGITS, KEYS>, C: Dexter
             }
             ApplicationState::PasswordListening => {
                 if let Some(password) = self.input.digits_input() {
-                    if self.core.verify_password(&from(password)) {
+                    if self.core.verify_password(&to_dexter_password(password)) {
                         self.state = ApplicationState::Unlocked;
                     } else {
                         self.state = ApplicationState::Locked;
@@ -81,7 +86,7 @@ impl<const DIGITS: usize, const KEYS: usize, I: InputUI<DIGITS, KEYS>, C: Dexter
             }
             ApplicationState::PasswordBuilding => {
                 if let Some(password) = self.input.digits_input() {
-                    self.core.set_password(&from(password));
+                    self.core.set_password(&to_dexter_password(password));
                 } else {
                 }
             }

@@ -1,7 +1,10 @@
 pub mod devices;
 pub mod stateful_devices;
 
+pub type DigitKeysValue<const DIGITS: usize, const KEYS: usize> = [[bool; KEYS]; DIGITS];
+pub type KeysValue<const KEYS: usize> = [bool; KEYS];
+
 pub trait InputUI<const DIGITS: usize, const KEYS: usize> {
-    fn digits_input(&self) -> Option<[[bool; KEYS]; DIGITS]>;
-    fn keys_input(&self) -> Option<[bool; KEYS]>;
+    fn digits_input(&self) -> Option<DigitKeysValue<DIGITS, KEYS>>;
+    fn keys_input(&self) -> Option<KeysValue<KEYS>>;
 }
