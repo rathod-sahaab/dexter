@@ -1,8 +1,9 @@
-use super::{
+use crate::{
     application_state::ApplicationState,
     core::DexterCore,
     traits::ui::{InputUI, KeysValue},
 };
+use core::{convert::Into, iter::IntoIterator, iter::Iterator, option::Option::Some};
 
 pub struct Application<
     const DIGITS: usize,
@@ -36,7 +37,7 @@ impl<const DIGITS: usize, const KEYS: usize, I: InputUI<DIGITS, KEYS>, C: Dexter
     pub fn looper(&mut self) {
         match self.state {
             ApplicationState::Locked => {
-                if let Some(keys) = self.input.keys_input() {
+                if let Some(_) = self.input.keys_input() {
                     self.state = ApplicationState::PasswordListening;
                 }
             }

@@ -1,9 +1,17 @@
 [package]
-name = "dexter-new"
+name = "dexter"
 version = "0.1.0"
 authors = ["Abhay Raj Singh <abhayonlyone@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
+
+[lib]
+name = "dexter_core"
+path = "lib/dexter_core/lib.rs"
+
+[[bin]]
+name = "dexter_esp32"
+path = "src/main.rs"
 
 [dependencies]
 hal = { package = "esp32-hal", version = "0.15.0" }

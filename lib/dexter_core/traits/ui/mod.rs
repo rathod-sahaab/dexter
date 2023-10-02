@@ -1,9 +1,12 @@
+use core::{convert::From, iter::IntoIterator, iter::Iterator, option::Option};
+
 use super::secrets::password::Password;
 
 pub mod devices;
 pub mod stateful_devices;
 
 pub struct DigitKeysValue<const DIGITS: usize, const KEYS: usize>(pub [[bool; KEYS]; DIGITS]);
+
 pub struct KeysValue<const KEYS: usize>(pub [bool; KEYS]);
 
 impl<const DIGITS: usize, const KEYS: usize> From<DigitKeysValue<DIGITS, KEYS>>

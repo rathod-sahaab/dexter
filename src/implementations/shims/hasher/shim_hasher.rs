@@ -1,4 +1,4 @@
-use crate::dexter_core::traits::secrets::{
+use dexter_core::traits::secrets::{
     hasher::{Hash, Hasher},
     password::Password,
 };

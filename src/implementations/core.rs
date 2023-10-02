@@ -1,4 +1,4 @@
-use crate::dexter_core::{
+use dexter_core::{
     core::DexterCore,
     traits::{
         secrets::{

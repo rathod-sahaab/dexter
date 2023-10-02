@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
 
-mod commons;
-mod dexter_core;
 mod implementations;
 
 extern crate alloc;

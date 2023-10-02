@@ -153,7 +153,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dexter-new"
+name = "dexter"
 version = "0.1.0"
 dependencies = [
  "embedded-io 0.4.0",

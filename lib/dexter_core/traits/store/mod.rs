@@ -1,4 +1,6 @@
-use crate::dexter_core::traits::secrets::hasher::Hash;
+use core::option::Option;
+
+use crate::traits::secrets::hasher::Hash;
 
 pub trait HashStore<const HASH_LENGTH: usize> {
     fn set(&self, array: &Hash<HASH_LENGTH>);

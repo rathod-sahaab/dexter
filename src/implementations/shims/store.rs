@@ -1,5 +1,5 @@
-use crate::dexter_core::traits::secrets::hasher::Hash;
-use crate::dexter_core::traits::store::HashStore;
+use dexter_core::traits::secrets::hasher::Hash;
+use dexter_core::traits::store::HashStore;
 
 pub struct NoStore {}
 
