@@ -1,3 +1,5 @@
+use crate::dexter_core::traits::ui::KeysValue;
+
 /**
  * This is a buffered keypad only when the input is final do we return anything,
  * else we return none.
@@ -22,5 +24,5 @@
  * [4]: 0 0 0 0 0 0 -> None
  */
 pub trait StatefulKeypad<const KEYS: usize> {
-    fn get(&self) -> Option<[bool; KEYS]>;
+    fn get(&self) -> Option<KeysValue<KEYS>>;
 }

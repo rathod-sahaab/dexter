@@ -1,10 +1,7 @@
 use super::{
     application_state::ApplicationState,
     core::DexterCore,
-    traits::{
-        secrets::password::Password,
-        ui::{DigitKeysValue, InputUI},
-    },
+    traits::ui::{InputUI, KeysValue},
 };
 
 pub struct Application<
@@ -18,37 +15,20 @@ pub struct Application<
     core: C,
 }
 
-fn to_dexter_password<const DIGITS: usize, const KEYS: usize>(
-    data: DigitKeysValue<DIGITS, KEYS>,
-) -> Password<DIGITS> {
-    data.map(|digit_keys| {
-        digit_keys
-            .into_iter()
-            .rev()
-            .enumerate()
-            .fold(0u8, |acc, (index, value)| {
-                acc + if value {
-                    (index as u8) * (index as u8)
-                } else {
-                    0
-                }
-            })
-    })
-}
-
 impl<const DIGITS: usize, const KEYS: usize, I: InputUI<DIGITS, KEYS>, C: DexterCore<DIGITS>>
     Application<DIGITS, KEYS, I, C>
 {
-    fn password_reset_code(keys: [bool; KEYS]) -> bool {
+    fn password_reset_code(keys: &KeysValue<KEYS>) -> bool {
         Self::only_one_key(keys, KEYS - 1)
     }
 
-    fn lock_code(keys: [bool; KEYS]) -> bool {
+    fn lock_code(keys: &KeysValue<KEYS>) -> bool {
         Self::only_one_key(keys, KEYS - 1)
     }
 
-    fn only_one_key(keys: [bool; KEYS], allowed_key_index: usize) -> bool {
-        keys.into_iter()
+    fn only_one_key(keys: &KeysValue<KEYS>, allowed_key_index: usize) -> bool {
+        keys.0
+            .into_iter()
             .enumerate()
             .all(|(index, key)| (index == allowed_key_index) ^ key)
     }
@@ -61,8 +41,8 @@ impl<const DIGITS: usize, const KEYS: usize, I: InputUI<DIGITS, KEYS>, C: Dexter
                 }
             }
             ApplicationState::PasswordListening => {
-                if let Some(password) = self.input.digits_input() {
-                    if self.core.verify_password(&to_dexter_password(password)) {
+                if let Some(password_digits) = self.input.digits_input() {
+                    if self.core.verify_password(&password_digits.into()) {
                         self.state = ApplicationState::Unlocked;
                     } else {
                         self.state = ApplicationState::Locked;
@@ -71,16 +51,16 @@ impl<const DIGITS: usize, const KEYS: usize, I: InputUI<DIGITS, KEYS>, C: Dexter
             }
             ApplicationState::Unlocked => {
                 if let Some(keys) = self.input.keys_input() {
-                    if Self::lock_code(keys) {
+                    if Self::lock_code(&keys) {
                         self.state = ApplicationState::Locked
-                    } else if Self::password_reset_code(keys) {
+                    } else if Self::password_reset_code(&keys) {
                         self.state = ApplicationState::PasswordBuilding
                     }
                 }
             }
             ApplicationState::PasswordBuilding => {
-                if let Some(password) = self.input.digits_input() {
-                    self.core.set_password(&to_dexter_password(password));
+                if let Some(password_digits) = self.input.digits_input() {
+                    self.core.set_password(&password_digits.into());
                 } else {
                 }
             }

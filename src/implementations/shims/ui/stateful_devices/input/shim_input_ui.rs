@@ -4,11 +4,11 @@ struct ShimInputUI<const DIGITS: usize, const KEYS: usize> {}
 
 impl<const DIGITS: usize, const KEYS: usize> InputUI<DIGITS, KEYS> for ShimInputUI<DIGITS, KEYS> {
     fn digits_input(&self) -> Option<DigitKeysValue<DIGITS, KEYS>> {
-        Some([[false; KEYS]; DIGITS])
+        Some(DigitKeysValue([[false; KEYS]; DIGITS]))
     }
 
     fn keys_input(&self) -> Option<KeysValue<KEYS>> {
-        Some([false; KEYS])
+        Some(KeysValue([false; KEYS]))
     }
 }
 
